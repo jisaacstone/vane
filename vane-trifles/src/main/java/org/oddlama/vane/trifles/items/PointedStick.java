@@ -1,36 +1,25 @@
 package org.oddlama.vane.trifles.items;
 
-import static org.oddlama.vane.util.PlayerUtil.swing_arm;
-import static org.oddlama.vane.util.PlayerUtil.give_items;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.EnumSet;
 
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Slime;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 import org.oddlama.vane.annotation.item.VaneItem;
 import org.oddlama.vane.core.config.recipes.RecipeList;
 import org.oddlama.vane.core.config.recipes.ShapelessRecipeDefinition;
 import org.oddlama.vane.core.item.CustomItem;
+import org.oddlama.vane.core.item.api.InhibitBehavior;
 import org.oddlama.vane.core.module.Context;
-import org.oddlama.vane.core.resourcepack.ResourcePackGenerator;
 import org.oddlama.vane.trifles.Trifles;
-import org.oddlama.vane.util.StorageUtil;
 
-@VaneItem(name = "pointed_stick", base = Material.STICK, durability = 100, model_data = 0x760018, version = 1)
+@VaneItem(name = "pointed_stick", base = Material.WOODEN_SWORD, durability = 100, model_data = 0x760018, version = 2)
 public class PointedStick extends CustomItem<Trifles> {
 	public PointedStick(Context<Trifles> context) {
 		super(context);
@@ -43,58 +32,61 @@ public class PointedStick extends CustomItem<Trifles> {
 			.result(key().toString()));
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public void on_player_interact_entity(final PlayerInteractEntityEvent event) {
-		final var entity = event.getRightClicked();
-		if (entity instanceof Slime slime) {
-			return;
-		}
-    return;
-
-		/*/ With a empty bucket in main hand /*
-		final var player = event.getPlayer(); /*
-		final var item_in_hand = player.getEquipment().getItem(event.getHand());
-		if (item_in_hand.getType() != Material.BUCKET) {
-			return;
-		} 
-
-		entity.remove();
-		swing_arm(player, event.getHand());
-		player.playSound(player, Sound.ENTITY_SLIME_JUMP, SoundCategory.MASTER, 1.0f, 2.0f);
-    return; 
-
-		final var new_stack = newStack();
-		new_stack.editMeta(meta -> {
-			final var correct_model_data = player.getChunk().isSlimeChunk() ? CUSTOM_MODEL_DATA_JUMPY : CUSTOM_MODEL_DATA_QUIET;
-			meta.setCustomModelData(correct_model_data);
-		});
-
-		if (item_in_hand.getAmount() == 1) {
-			// Replace with Slime Bucket
-			player.getEquipment().setItem(event.getHand(), new_stack);
-		} else {
-			// Reduce amount and add SlimeBucket to inventory
-			item_in_hand.setAmount(item_in_hand.getAmount() - 1);
-			give_items(player, new_stack, 1);
-		}*/
+	@EventHandler
+	public void onEntityDamage(EntityDamageByEntityEvent event)
+	{
+	    if (event.getDamager() instanceof Player player){
+			final var item = player.getInventory().getItemInMainHand();
+			final var custom_item = get_module().core.item_registry().get(item);
+			if (!(custom_item instanceof PointedStick stick) || !stick.enabled()) {
+				return;
+			}
+			final var damaged = event.getEntity();
+			damaged.setGlowing(damaged.hasGravity());
+			damaged.setGravity(!damaged.hasGravity());
+	    }
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	public void on_player_interact(final PlayerInteractEvent event) {
-		final var player = event.getPlayer(); /*
-		final var item_in_hand = player.getEquipment().getItem(event.getHand());
-		if (item_in_hand.getType() != Material.BUCKET) {
-			return;
-		} */
-
-		//entity.remove();
-		swing_arm(player, event.getHand());
-		player.playSound(player, Sound.ENTITY_SLIME_JUMP, SoundCategory.MASTER, 1.0f, 2.0f);
-    return; /*
-		// Skip if no block was right-clicked
-		if (!event.hasBlock() || event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+	public void on_player_interact_block(final PlayerInteractEvent event) {
+		// Skip if no block was right-clicked or hand isn't main hand
+		if (!event.hasBlock() || event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) {
 			return;
 		}
+/*
+		// With a trowel in main hand
+		final var player = event.getPlayer();
+		final var item_in_hand = player.getEquipment().getItem(EquipmentSlot.HAND);
+		final var custom_item = get_module().core.item_registry().get(item_in_hand);
+		if (!(custom_item instanceof Trowel trowel) || !trowel.enabled()) {
+			return;
+		}
+
+		// Prevent offhand from triggering (e.g. placing torches)
+		event.setUseInteractedBlock(Event.Result.DENY);
+		event.setUseItemInHand(Event.Result.DENY);
+/*
+		// Select a random block from the feed source and place it
+		final var block = event.getClickedBlock();
+		final var world = player.getWorld();
+		final var new_block = world.getBlockAt(block.getX(), block.getY() + 1, block.getZ());
+		if (!new_block.canPlace(block.getBlockData())) {
+			return;
+		}
+		new_block.setType(block.getType());
+		new_block.setBlockData(block.getBlockData());
+		block.setType(Material.AIR);
+		/*
+		if (block.getType() == Material.SALMON) {
+			block.setType(Material.COOKED_SALMON);
+		}
+		if (block.getType() == Material.COD) {
+			block.setType(Material.COOKED_COD);
+		}
+		if (block.getType() == Material.POTATO) {
+			block.setType(Material.BAKED_POTATO);
+		}
+		/*
 
 		final var player = event.getPlayer();
 		final var item_in_hand = player.getEquipment().getItem(event.getHand());
@@ -125,5 +117,10 @@ public class PointedStick extends CustomItem<Trifles> {
 			item_in_hand.setAmount(item_in_hand.getAmount() - 1);
 			give_items(player, new ItemStack(Material.BUCKET), 1);
 		} */
+	}
+
+	@Override
+	public EnumSet<InhibitBehavior> inhibitedBehaviors() {
+		return EnumSet.of(InhibitBehavior.USE_OFFHAND);
 	}
 }
