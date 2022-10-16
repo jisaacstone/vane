@@ -19,5 +19,6 @@ public class Enchantments extends Module<Enchantments> {
 		new org.oddlama.vane.enchantments.enchantments.TakeOff(this);
 		new org.oddlama.vane.enchantments.enchantments.Unbreakable(this);
 		new org.oddlama.vane.enchantments.enchantments.Wings(this);
+		new org.oddlama.vane.enchantments.enchantments.FireWalker(this);
 	}
 }

@@ -20,8 +20,8 @@ import org.oddlama.vane.core.module.Context;
 import org.oddlama.vane.trifles.Trifles;
 
 @VaneItem(name = "pointed_stick", base = Material.WOODEN_SWORD, durability = 42, model_data = 0x760018, version = 1)
-public class PointedStick extends CustomItem<Trifles> {
-	public PointedStick(Context<Trifles> context) {
+public class IceSkate extends CustomItem<Trifles> {
+	public IceSkate(Context<Trifles> context) {
 		super(context);
 	}
 
@@ -38,7 +38,7 @@ public class PointedStick extends CustomItem<Trifles> {
 	    if (event.getDamager() instanceof Player player){
 			final var item = player.getInventory().getItemInMainHand();
 			final var custom_item = get_module().core.item_registry().get(item);
-			if (!(custom_item instanceof PointedStick stick) || !stick.enabled()) {
+			if (!(custom_item instanceof IceSkate stick) || !stick.enabled()) {
 				return;
 			}
 			final var damaged = event.getEntity();
@@ -62,7 +62,7 @@ public class PointedStick extends CustomItem<Trifles> {
 		final var player = event.getPlayer();
 		final var item_in_hand = player.getEquipment().getItem(EquipmentSlot.HAND);
 		final var custom_item = get_module().core.item_registry().get(item_in_hand);
-		if (!(custom_item instanceof PointedStick ps) || !ps.enabled()) {
+		if (!(custom_item instanceof IceSkate ps) || !ps.enabled()) {
 			return;
 		}
 
