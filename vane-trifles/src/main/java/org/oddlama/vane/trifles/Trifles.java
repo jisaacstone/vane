@@ -39,6 +39,7 @@ public class Trifles extends Module<Trifles> {
 		new org.oddlama.vane.trifles.items.NorthCompass(this);
 		new org.oddlama.vane.trifles.items.SlimeBucket(this);
 		new org.oddlama.vane.trifles.items.PointedStick(this);
+		new org.oddlama.vane.trifles.items.IceSkate(this);
 
 		storage_group = new StorageGroup(this);
 		new org.oddlama.vane.trifles.items.storage.Pouch(storage_group.get_context());
