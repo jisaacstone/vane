@@ -71,7 +71,11 @@ item_file:
 
 item_pointed_stick:
   # The display name of this item variant.
-  name: "Pointed stick"
+  name: "Pointed Stick"
+
+item_ice_skates:
+  # The display name of this item variant.
+  name: "Ice Skates"
 
 item_slime_bucket:
   # The display name of this item variant.

@@ -18,7 +18,7 @@ import org.oddlama.vane.core.module.Context;
 import org.oddlama.vane.enchantments.Enchantments;
 
 @VaneEnchantment(
-	name = "grappling_hook",
+	name = "fire_walker",
 	max_level = 3,
 	rarity = Rarity.UNCOMMON,
 	treasure = true,
@@ -33,7 +33,7 @@ public class FireWalker extends CustomEnchantment<Enchantments> {
 	@Override
 	public RecipeList default_recipes() {
 		return RecipeList.of(new ShapedRecipeDefinition("generic")
-			.shape("u", "b", "u")
+			.shape("l", "b", "l")
 			.set_ingredient('b', "vane_enchantments:ancient_tome_of_knowledge")
 			.set_ingredient('l', Material.LAVA_BUCKET)
 			.result(on("vane_enchantments:enchanted_ancient_tome_of_knowledge")));

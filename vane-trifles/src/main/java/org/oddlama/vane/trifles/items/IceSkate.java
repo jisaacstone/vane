@@ -1,28 +1,19 @@
 package org.oddlama.vane.trifles.items;
 
 import static org.oddlama.vane.util.Conversions.ms_to_ticks;
-import java.util.EnumSet;
+
 import java.util.Set;
 
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.oddlama.vane.annotation.item.VaneItem;
 import org.oddlama.vane.core.config.recipes.RecipeList;
 import org.oddlama.vane.core.config.recipes.ShapedRecipeDefinition;
-import org.oddlama.vane.core.config.recipes.ShapelessRecipeDefinition;
 import org.oddlama.vane.core.item.CustomItem;
-import org.oddlama.vane.core.item.api.InhibitBehavior;
 import org.oddlama.vane.core.module.Context;
 import org.oddlama.vane.trifles.Trifles;
 
@@ -36,13 +27,19 @@ public class IceSkate extends CustomItem<Trifles> {
 	);
 	
 	private static final PotionEffect slide_effect =
-		new PotionEffect(PotionEffectType.SPEED, (int) ms_to_ticks(300), 2)
+		new PotionEffect(PotionEffectType.SPEED, (int) ms_to_ticks(300), 3)
 			.withAmbient(false)
 			.withParticles(false)
 			.withIcon(false);
 
 	private static final PotionEffect slow_effect =
-		new PotionEffect(PotionEffectType.SLOW, (int) ms_to_ticks(300), 1)
+		new PotionEffect(PotionEffectType.SPEED, (int) ms_to_ticks(300), 1)
+			.withAmbient(false)
+			.withParticles(false)
+			.withIcon(false);
+
+	private static final PotionEffect jump_effect =
+		new PotionEffect(PotionEffectType.JUMP, (int) ms_to_ticks(200), 1)
 			.withAmbient(false)
 			.withParticles(false)
 			.withIcon(false);
@@ -55,7 +52,7 @@ public class IceSkate extends CustomItem<Trifles> {
 	public RecipeList default_recipes() {
 		return RecipeList.of(new ShapedRecipeDefinition("generic")
 			.shape("b", "s")
-			.set_ingredient('m', Material.LEATHER_BOOTS)
+			.set_ingredient('b', Material.LEATHER_BOOTS)
 			.set_ingredient('s', Material.IRON_SWORD)
 			.result(key().toString()));
 	}
@@ -85,6 +82,9 @@ public class IceSkate extends CustomItem<Trifles> {
 		
 		if (skateMaterials.contains(block.getType())) { // ice material
 			player.addPotionEffect(slide_effect);
+			if (player.isSneaking()) {
+				player.addPotionEffect(jump_effect);
+			}
 		} else {
 			player.addPotionEffect(slow_effect);
 		}
